@@ -1,0 +1,27 @@
+{
+  "name": "discordjs-voice-bot",
+  "version": "0.9.0",
+  "description": "A sample Discord bot that plays sounds. Built using discord.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaeljdeeb/discordjs-voice-bot.git"
+  },
+  "keywords": [
+    "discordjs",
+    "bot",
+    "sample"
+  ],
+  "author": "Michael Deeb",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/michaeljdeeb/discordjs-voice-bot/issues"
+  },
+  "homepage": "https://github.com/michaeljdeeb/discordjs-voice-bot#readme",
+  "dependencies": {
+    "discord.js": "^8.0.0"
+  }
+}
