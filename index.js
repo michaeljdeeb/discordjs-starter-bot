@@ -1,15 +1,30 @@
 'use strict';
 
+var fs = require('fs');
 var Discord = require('discord.js');
-var bot = new Discord.Client({ autoReconnect: true })
+var bot = new Discord.Client({ autoReconnect: true });
+
+var autoLeaveVoice = true;
+var autoLoadSounds = false;
 
 var soundPath = './sounds/';
-var autoLeaveVoice = true;
+var soundCommandTrigger = '!';
+
 var commands = new Map();
 commands.set(/liftoff/i, ['text', 'Houston, we have liftoff!']);
 commands.set(/!smallstep/i, ['sound', 'smallstep.mp3']);
 commands.set(/!exit/i, ['function', leaveVoiceChannel]);
 // commands.set(//i, ['', '']);
+
+function addSoundsTo(map, fromDirectoryPath) {
+  var soundFiles = fs.readdir(fromDirectoryPath, function(err, files) {
+    files.forEach(function(file) {
+      var command = soundCommandTrigger + file.split('.')[0].split('-').join(' ');
+      var commandRegExp = new RegExp(command, 'i');
+      map.set(commandRegExp, ['sound', file]);
+    });
+  });
+}
 
 function leaveVoiceChannel() {
   if(bot.voiceConnection) {
@@ -61,4 +76,10 @@ bot.on('message', function(message) {
   }
 });
 
-bot.loginWithToken('APP_BOT_USER_TOKEN');
+(function init() {
+  bot.loginWithToken('APP_BOT_USER_TOKEN');
+
+  if(autoLoadSounds) {
+    addSoundsTo(commands, soundPath);
+  }
+})();
