@@ -1,0 +1,8 @@
+{
+  "autoLeaveVoice": true,
+  "autoLoadSounds": false,
+  "soundPath": "./sounds",
+  "commandTrigger": "!",
+  "botPrefix": "bot",
+  "botToken": "APP_BOT_USER_TOKEN"
+}

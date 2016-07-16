@@ -1,21 +1,35 @@
 'use strict';
 
 var fs = require('fs');
+var config = require('./config.json');
 var Discord = require('discord.js');
 var bot = new Discord.Client({ autoReconnect: true });
 
-var autoLeaveVoice = true;
-var autoLoadSounds = false;
-
-var soundPath = './sounds/';
-var commandTrigger = '!';
-var botPrefix = 'bot';
-
 var commands = new Map();
+var triggerPrefix = config.commandTrigger + config.botPrefix + ' ';
 commands.set(/liftoff/i, ['text', 'Houston, we have liftoff!']);
 commands.set(/!smallstep/i, ['sound', 'smallstep.mp3']);
-commands.set(new RegExp(commandTrigger + botPrefix + ' ' + exit, 'i'), ['function', leaveVoiceChannel]);
+commands.set(new RegExp(triggerPrefix + 'exit', 'i'), ['function', leaveVoiceChannel]);
+commands.set(new RegExp(triggerPrefix + 'help', 'i'), ['function', displayCommands]);
 // commands.set(//i, ['', '']);
+
+function displayCommands(message) {
+  var helpMessage = '';
+
+  if(message.content.split(' ')[2]) {
+    var helpFilter = new RegExp(message.content.split(' ')[2], 'i');
+    commands.forEach(function(fileName, command){
+      if(command.toString().match(helpFilter)) {
+        helpMessage += command.toString().split('/')[1] + '\n';
+      }
+    });
+  } else {
+    commands.forEach(function(fileName, command){
+      helpMessage += command.toString().split('/')[1] + '\n';
+    });
+  }
+  bot.sendMessage(message.channel, helpMessage);
+}
 
 function addSoundsTo(map, fromDirectoryPath) {
   var soundFiles = fs.readdir(fromDirectoryPath, function(err, files) {
@@ -29,7 +43,7 @@ function addSoundsTo(map, fromDirectoryPath) {
   });
 }
 
-function leaveVoiceChannel() {
+function leaveVoiceChannel(message) {
   if(bot.voiceConnection) {
     bot.voiceConnection.destroy();
   }
@@ -37,14 +51,14 @@ function leaveVoiceChannel() {
 
 function playSound(authorChannel, authorVoiceChannel, sound) {
   bot.joinVoiceChannel(authorVoiceChannel).then(function(connection, error) {
-    connection.playFile(soundPath + sound).then(function(intent, error) {
+    connection.playFile(config.soundPath + sound).then(function(intent, error) {
       if(error) {
         bot.sendMessage(authorChannel, 'Error: ' + error);
       }
       intent.on('error', function(streamError) {
         bot.sendMessage(authorChannel, 'Error: ' + streamError);
       });
-      if(autoLeaveVoice) {
+      if(config.autoLeaveVoice) {
         intent.on('end', function() {
           connection.destroy();
         });
@@ -63,16 +77,16 @@ bot.on('message', function(message) {
       if(message.content.match(regexp)) {
         switch(botReply[0]) {
           case 'function':
-            botReply[1]();
-            break;
+          botReply[1](message);
+          break;
           case 'sound':
-            playSound(message.channel, message.author.voiceChannel, botReply[1]);
-            break;
+          playSound(message.channel, message.author.voiceChannel, botReply[1]);
+          break;
           case 'text':
-            sendMessage(message.channel, botReply[1]);
-            break;
+          sendMessage(message.channel, botReply[1]);
+          break;
           default:
-            break;
+          break;
         }
       }
     });
@@ -80,9 +94,9 @@ bot.on('message', function(message) {
 });
 
 (function init() {
-  bot.loginWithToken('APP_BOT_USER_TOKEN');
+  bot.loginWithToken(config.botToken);
 
-  if(autoLoadSounds) {
-    addSoundsTo(commands, soundPath);
+  if(config.autoLoadSounds) {
+    addSoundsTo(commands, config.soundPath);
   }
 })();
