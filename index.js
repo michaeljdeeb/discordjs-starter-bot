@@ -50,13 +50,22 @@ function leaveVoiceChannel(message) {
 }
 
 function playSound(authorChannel, authorVoiceChannel, sound) {
-  bot.joinVoiceChannel(authorVoiceChannel).then(function(connection, error) {
-    connection.playFile(config.soundPath + sound).then(function(intent, error) {
-      if(error) {
-        bot.sendMessage(authorChannel, 'Error: ' + error);
+  bot.joinVoiceChannel(authorVoiceChannel).then(function(connection, joinError) {
+    if(joinError) {
+      var joinErrorMessage = 'Error joining voice channel: ';
+      console.log(joinErrorMessage, joinError);
+      bot.sendMessage(authorChannel, joinErrorMessage + joinError);
+    }
+    connection.playFile(config.soundPath + sound).then(function(intent, playError) {
+      if(playError) {
+        var playErrorMessage = 'Error playing sound file: ';
+        console.log(playErrorMessage, playError);
+        bot.sendMessage(authorChannel, playErrorMessage + playError);
       }
       intent.on('error', function(streamError) {
-        bot.sendMessage(authorChannel, 'Error: ' + streamError);
+        var streamErrorMessage = 'Error streaming sound file: ';
+        console.log(streamErrorMessage, streamError);
+        bot.sendMessage(authorChannel, streamErrorMessage + streamError);
       });
       if(config.autoLeaveVoice) {
         intent.on('end', function() {
