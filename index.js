@@ -44,8 +44,8 @@ function addSoundsTo(map, fromDirectoryPath) {
 }
 
 function leaveVoiceChannel(message) {
-  if(bot.voiceConnection) {
-    bot.voiceConnection.destroy();
+  if(bot.voiceConnections.get('server', message.server)) {
+    bot.voiceConnections.get('server', message.server).destroy();
   }
 }
 
