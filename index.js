@@ -7,29 +7,12 @@ var bot = new Discord.Client({ autoReconnect: true });
 
 var commands = new Map();
 var triggerPrefix = config.commandTrigger + config.botPrefix + ' ';
+commands.set(new RegExp(triggerPrefix + 'help', 'i'), ['function', displayCommands]);
+commands.set(new RegExp(triggerPrefix + 'random', 'i'), ['function', playRandomSound]);
+commands.set(new RegExp(triggerPrefix + 'exit', 'i'), ['function', leaveVoiceChannel]);
 commands.set(/liftoff/i, ['text', 'Houston, we have liftoff!']);
 commands.set(/!smallstep/i, ['sound', 'smallstep.mp3']);
-commands.set(new RegExp(triggerPrefix + 'exit', 'i'), ['function', leaveVoiceChannel]);
-commands.set(new RegExp(triggerPrefix + 'help', 'i'), ['function', displayCommands]);
 // commands.set(//i, ['', '']);
-
-function displayCommands(message) {
-  var helpMessage = '';
-
-  if(message.content.split(' ')[2]) {
-    var helpFilter = new RegExp(message.content.split(' ')[2], 'i');
-    commands.forEach(function(fileName, command){
-      if(command.toString().match(helpFilter)) {
-        helpMessage += command.toString().split('/')[1] + '\n';
-      }
-    });
-  } else {
-    commands.forEach(function(fileName, command){
-      helpMessage += command.toString().split('/')[1] + '\n';
-    });
-  }
-  bot.sendMessage(message.channel, helpMessage);
-}
 
 function addSoundsTo(map, fromDirectoryPath) {
   var soundFiles = fs.readdir(fromDirectoryPath, function(err, files) {
@@ -41,6 +24,10 @@ function addSoundsTo(map, fromDirectoryPath) {
       }
     });
   });
+}
+
+function sendMessage(authorChannel, text) {
+  bot.sendMessage(authorChannel, text);
 }
 
 function leaveVoiceChannel(message) {
@@ -76,8 +63,31 @@ function playSound(authorChannel, authorVoiceChannel, sound) {
   });
 }
 
-function sendMessage(authorChannel, text) {
-  bot.sendMessage(authorChannel, text);
+function playRandomSound(message) {
+  var values = [...commands.values()];
+  var picked = ['', ''];
+  while(picked[0] !== 'sound') {
+    picked = values[Math.round(values.length * Math.random())];
+  }
+  playSound(message.channel, message.author.voiceChannel, picked[1]);
+}
+
+function displayCommands(message) {
+  var helpMessage = '';
+
+  if(message.content.split(' ')[2]) {
+    var helpFilter = new RegExp(message.content.split(' ')[2], 'i');
+    commands.forEach(function(fileName, command){
+      if(command.toString().match(helpFilter)) {
+        helpMessage += command.toString().split('/')[1] + '\n';
+      }
+    });
+  } else {
+    commands.forEach(function(fileName, command){
+      helpMessage += command.toString().split('/')[1] + '\n';
+    });
+  }
+  bot.sendMessage(message.channel, helpMessage);
 }
 
 bot.on('message', function(message) {
