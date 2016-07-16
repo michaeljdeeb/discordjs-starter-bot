@@ -35,7 +35,7 @@ function addSoundsTo(map, fromDirectoryPath) {
   var soundFiles = fs.readdir(fromDirectoryPath, function(err, files) {
     files.forEach(function(file) {
       if(file[0] !== '.') {
-        var command = commandTrigger + file.split('.')[0].split('-').join(' ');
+        var command = config.commandTrigger + file.split('.')[0].split('-').join(' ');
         var commandRegExp = new RegExp(command, 'i');
         map.set(commandRegExp, ['sound', file]);
       }
