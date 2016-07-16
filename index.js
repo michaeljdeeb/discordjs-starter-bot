@@ -8,20 +8,23 @@ var autoLeaveVoice = true;
 var autoLoadSounds = false;
 
 var soundPath = './sounds/';
-var soundCommandTrigger = '!';
+var commandTrigger = '!';
+var botPrefix = 'bot';
 
 var commands = new Map();
 commands.set(/liftoff/i, ['text', 'Houston, we have liftoff!']);
 commands.set(/!smallstep/i, ['sound', 'smallstep.mp3']);
-commands.set(/!exit/i, ['function', leaveVoiceChannel]);
+commands.set(new RegExp(commandTrigger + botPrefix + ' ' + exit, 'i'), ['function', leaveVoiceChannel]);
 // commands.set(//i, ['', '']);
 
 function addSoundsTo(map, fromDirectoryPath) {
   var soundFiles = fs.readdir(fromDirectoryPath, function(err, files) {
     files.forEach(function(file) {
-      var command = soundCommandTrigger + file.split('.')[0].split('-').join(' ');
-      var commandRegExp = new RegExp(command, 'i');
-      map.set(commandRegExp, ['sound', file]);
+      if(file[0] !== '.') {
+        var command = commandTrigger + file.split('.')[0].split('-').join(' ');
+        var commandRegExp = new RegExp(command, 'i');
+        map.set(commandRegExp, ['sound', file]);
+      }
     });
   });
 }

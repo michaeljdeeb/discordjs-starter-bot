@@ -2,7 +2,7 @@
 A sample Discord bot that send messages and plays sounds. Built using [discord.js](https://github.com/hydrabolt/discord.js).
 
 ## Mini Docs
-`autoLeaveVoice` - When set to `true`, the bot will leave after playing a sound. The sound of a bot joining/leaving a voice channel can be annoying, so by setting this to false, the bot will stay in the voice channel until told to leave by the `!exit` command.
+`autoLeaveVoice` - When set to `true`, the bot will leave after playing a sound. The sound of a bot joining/leaving a voice channel can be annoying, so by setting this to false, the bot will stay in the voice channel until told to leave by the `!bot exit` command.
 
 `autoLoadSounds` - When set to `true`, the bot will attempt to load in every file placed in the `sounds` directory. To generate the sound's command, `soundCommandTrigger` is prepended, the audio extension is stripped off, and hyphens are converted to spaces.
 
